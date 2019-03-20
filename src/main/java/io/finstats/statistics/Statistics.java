@@ -4,33 +4,33 @@ public final class Statistics {
   /**
    * Total sum of transaction value
    */
-  private final Double sum;
+  private final double sum;
 
   /**
    * Average amount of transaction value
    */
-  private final Double avg;
+  private final double avg;
 
   /**
    * max transaction value
    */
-  private final Double max;
+  private final double max;
 
   /**
    * min transaction value
    */
-  private final Double min;
+  private final double min;
 
   /**
    * total number of transactions happened in the last 60 seconds
    */
-  private final Long count;
+  private final long count;
 
   Statistics() {
     this(0D, 0D, 0D, 0D, 0L);
   }
 
-  private Statistics(Double sum, Double avg, Double max, Double min, Long count) {
+  private Statistics(double sum, double avg, double max, double min, long count) {
     this.sum = sum;
     this.avg = avg;
     this.max = max;

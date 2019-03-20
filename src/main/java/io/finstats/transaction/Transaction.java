@@ -2,29 +2,25 @@ package io.finstats.transaction;
 
 public final class Transaction {
 
-  private final Double amount;
+  private final double amount;
+  private final long timestamp;
 
-  private final Long timestamp;
-
-  public Transaction(Double amount, Long timestamp) {
+  public Transaction(double amount, long timestamp) {
     this.amount = amount;
     this.timestamp = timestamp;
   }
 
-  public Double getAmount() {
+  public double getAmount() {
     return amount;
   }
 
-  public Long getTimestamp() {
+  public long getTimestamp() {
     return timestamp;
   }
 
   @Override
   public String toString() {
-    return "Transaction{" +
-        "amount=" + amount +
-        ", timestamp=" + timestamp +
-        '}';
+    return String.format("Transaction {amount=%f, timestamp=%d}", amount, timestamp);
   }
 }
 
