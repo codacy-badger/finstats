@@ -1,7 +1,6 @@
 package io.finstats;
 
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import io.finstats.api.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,31 +8,41 @@ import spark.Spark;
 import static spark.Spark.awaitInitialization;
 import static spark.Spark.port;
 
-public class FinStatsApp {
+class FinStatsApp {
     private static final Logger log = LoggerFactory.getLogger(FinStatsApp.class);
     private static final int DEFAULT_PORT = 7000;
+    private static final String BASE_URL = "http://localhost";
 
-    private final Router router;
+    private int serverPort;
 
-    @Inject
-    public FinStatsApp(Router router) {
-        this.router = router;
+    public FinStatsApp(int port) {
+        this.serverPort = port;
     }
 
-    public static void main(String[] args) {
-        Guice.createInjector(new FinStatsModule())
-            .getInstance(FinStatsApp.class)
-            .start(DEFAULT_PORT);
-    }
+    void start(int port) {
+        Router router = Guice
+            .createInjector(new FinStatsModule())
+            .getInstance(Router.class);
 
-    private void start(int port) {
+        if (port == 0) {
+            log.info("Starting on random serverPort");
+        }
+
         port(port);
 
-        Spark.get("/", (request, response) -> "Hello FinStats");
         Spark.path(router.getPath(), router.getRoutes());
 
         awaitInitialization();
 
+        port = Spark.port();
         log.info("Running at: http://localhost:{}", port);
+    }
+
+    public String getBaseUrl() {
+        return String.format("%s:%d", BASE_URL, serverPort);
+    }
+
+    public static void main(String[] args) {
+        new FinStatsApp().start(DEFAULT_PORT);
     }
 }
