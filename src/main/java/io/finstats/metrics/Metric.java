@@ -1,9 +1,7 @@
 package io.finstats.metrics;
 
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
 
-@Immutable
 public final class Metric {
   static final Metric ZERO = new Metric(0, 0, 0, 0);
 

@@ -1,6 +1,5 @@
 package io.finstats.metrics;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.finstats.transaction.Transaction;
 import java.time.Duration;
 import static java.time.Duration.ofMillis;
@@ -23,7 +22,6 @@ public class CircularMetricsStorage implements MetricsStorage {
     this(System::currentTimeMillis, INTERVAL);
   }
 
-  @VisibleForTesting
   CircularMetricsStorage(Supplier<Long> now, Duration interval) {
     this.now = now;
     this.interval = interval;

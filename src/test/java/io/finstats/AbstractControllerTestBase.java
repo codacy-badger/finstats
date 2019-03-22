@@ -6,6 +6,5 @@ public abstract class AbstractControllerTestBase {
 
   @BeforeClass
   public static void setUpClass() {
-    FinStatsApp.start(0);
   }
 }

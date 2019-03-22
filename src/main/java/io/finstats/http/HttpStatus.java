@@ -1,4 +1,4 @@
-package io.finstats.api;
+package io.finstats.http;
 
 public enum HttpStatus {
   CREATED(201),
