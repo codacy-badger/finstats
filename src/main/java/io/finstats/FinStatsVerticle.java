@@ -1,53 +1,37 @@
 package io.finstats;
 
 import io.finstats.http.HttpStatus;
-import io.finstats.metrics.CircularMetricsStorage;
-import io.finstats.metrics.InvalidTimestampException;
-import io.finstats.metrics.MetricsStorage;
-import io.finstats.transaction.Transaction;
+import io.finstats.transaction.TransactionRestAPIVerticle;
+import static io.finstats.utils.LoggingUtils.configureLogging;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
-import static io.vertx.core.json.Json.decodeValue;
-import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FinStatsVerticle extends AbstractVerticle {
+  private final static Logger LOGGER = LoggerFactory.getLogger(FinStatsVerticle.class);
   private static final int PORT = 7000;
-  private MetricsStorage metricsStorage;
 
   @Override
   public void init(Vertx vertx, Context context) {
     super.init(vertx, context);
-    metricsStorage = new CircularMetricsStorage();
+    configureLogging();
   }
 
   @Override
   public void start() {
-    Router api = Router.router(vertx);
+    //Router api = Router.router(vertx);
 
-    api.route("/").handler(this::index);
-    api.post("/transactions").handler(this::registerTransaction);
-    api.get("/statistics").handler(this::getStatistics);
+    //api.route("/").handler(this::index);
+    //api.post("/transactions").handler(this::registerTransaction);
+    //api.get("/statistics").handler(this::getStatistics);
 
+    vertx.deployVerticle(new TransactionRestAPIVerticle());
     vertx
         .createHttpServer()
-        .requestHandler(api)
         .listen(PORT);
-  }
-
-  private void registerTransaction(RoutingContext context) {
-    final Transaction transaction = decodeValue(context.getBodyAsString(), Transaction.class);
-    try {
-      metricsStorage.addMetric(transaction);
-      context.response()
-          .setStatusCode(HttpStatus.CREATED.getCode())
-          .end();
-    } catch (InvalidTimestampException e) {
-      context.response()
-          .setStatusCode(HttpStatus.NO_CONTENT.getCode())
-          .end();
-    }
   }
 
   private void getStatistics(RoutingContext context) {
