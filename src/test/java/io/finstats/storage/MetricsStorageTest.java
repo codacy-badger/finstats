@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
-class CircularMetricsStorageTest {
+class MetricsStorageTest {
 
   private static final int TEST_INTERVAL = 10;
   private static final long NOW = System.currentTimeMillis();

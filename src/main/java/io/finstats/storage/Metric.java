@@ -62,8 +62,12 @@ public final class Metric {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     Metric metric = (Metric) o;
     return Double.compare(metric.sum, sum) == 0 &&
         Double.compare(metric.max, max) == 0 &&
