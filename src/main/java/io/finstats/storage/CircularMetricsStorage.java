@@ -1,4 +1,4 @@
-package io.finstats.metrics;
+package io.finstats.storage;
 
 import io.finstats.transaction.Transaction;
 import java.time.Duration;

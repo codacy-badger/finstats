@@ -1,4 +1,4 @@
-package io.finstats.metrics;
+package io.finstats.storage;
 
 import java.util.Objects;
 

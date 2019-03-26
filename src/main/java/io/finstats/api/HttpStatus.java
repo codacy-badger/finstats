@@ -1,6 +1,6 @@
-package io.finstats.http;
+package io.finstats.api;
 
-public enum HttpStatus {
+enum HttpStatus {
   CREATED(201),
   NO_CONTENT(204);
 
@@ -10,7 +10,7 @@ public enum HttpStatus {
     this.code = statusCode;
   }
 
-  public int getCode() {
+  int getCode() {
     return code;
   }
 }

@@ -1,19 +1,19 @@
-package io.finstats.metrics;
+package io.finstats.storage;
 
 import io.finstats.transaction.Transaction;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class CircularMetricsStorageTest {
+class CircularMetricsStorageTest {
 
   private static final int TEST_INTERVAL = 10;
   private static final long NOW = System.currentTimeMillis();
   private final static CircularMetricsStorage storage = createTestStorage();
 
   @Test
-  public void shouldGenerateCorrectIndex() {
+  void shouldGenerateCorrectIndex() {
     for (int i = 1; i <= 10; i++) {
       storage.addMetric(new Transaction(100, secondsAgo(i)));
     }

@@ -1,4 +1,4 @@
-package io.finstats.metrics;
+package io.finstats.storage;
 
 public class InvalidTimestampException extends RuntimeException {
   private InvalidTimestampException(String message) {
