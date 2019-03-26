@@ -1,7 +1,9 @@
 package io.finstats.storage;
 
 import io.finstats.transaction.Transaction;
+import java.util.stream.Stream;
 
 public interface MetricsStorage {
-  void addMetric(Transaction transaction);
+  void storeMetric(Transaction transaction);
+  Stream<Metric> getMetricsStream();
 }

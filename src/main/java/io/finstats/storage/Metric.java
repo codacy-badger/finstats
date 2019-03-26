@@ -3,7 +3,7 @@ package io.finstats.storage;
 import java.util.Objects;
 
 public final class Metric {
-  static final Metric ZERO = new Metric(0, 0, 0, 0);
+  public static final Metric ZERO = new Metric(0, 0, 0, 0);
 
   private final double sum;
   private final double max;
@@ -17,36 +17,47 @@ public final class Metric {
     this.count = count;
   }
 
-  private static Metric from(double amount) {
-    return new Metric(amount, amount, amount, 1);
+  public Metric merge(Metric other) {
+    return new Metric(
+        sum + other.sum,
+        Math.max(max, other.max),
+        Math.min(min, other.min),
+        count + other.count
+    );
   }
 
-  private static Metric from(Metric other, double amount) {
-    double max = Math.max(other.getMax(), amount);
-    double min =  Math.min(other.getMin(), amount);
-    return new Metric(other.getSum() + amount, max, min, other.getCount() + 1);
+  static Metric getOrIncrement(Metric metric, double amount) {
+    return ZERO.equals(metric)
+        ? new Metric(amount, amount, amount, 1)
+        : metric.increment(amount);
   }
 
-  Metric getOrIncrement(double amount) {
-    return ZERO.equals(this)
-        ? Metric.from(amount)
-        : Metric.from(this, amount);
+  private Metric increment(double amount) {
+    return new Metric(
+        sum + amount,
+        Math.max(max, amount),
+        Math.min(min, amount),
+        count + 1);
   }
 
-  double getSum() {
+  public double getSum() {
     return sum;
   }
 
-  double getMax() {
+  public double getMax() {
     return max;
   }
 
-  double getMin() {
+  public double getMin() {
     return min;
   }
 
-  long getCount() {
+  public long getCount() {
     return count;
+  }
+
+  public double getAvg() {
+    return sum > 0 ? sum / count : Double.NaN;
   }
 
   @Override

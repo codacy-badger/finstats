@@ -10,12 +10,12 @@ class CircularMetricsStorageTest {
 
   private static final int TEST_INTERVAL = 10;
   private static final long NOW = System.currentTimeMillis();
-  private final static CircularMetricsStorage storage = createTestStorage();
+  private final static MetricsStorageImpl storage = createTestStorage();
 
   @Test
   void shouldGenerateCorrectIndex() {
     for (int i = 1; i <= 10; i++) {
-      storage.addMetric(new Transaction(100, secondsAgo(i)));
+      storage.storeMetric(new Transaction(100, secondsAgo(i)));
     }
   }
 
@@ -23,7 +23,7 @@ class CircularMetricsStorageTest {
     return NOW - TimeUnit.SECONDS.toMillis(seconds);
   }
 
-  private static CircularMetricsStorage createTestStorage() {
-    return new CircularMetricsStorage(() -> NOW, Duration.of(TEST_INTERVAL, ChronoUnit.SECONDS));
+  private static MetricsStorageImpl createTestStorage() {
+    return new MetricsStorageImpl(() -> NOW, Duration.of(TEST_INTERVAL, ChronoUnit.SECONDS));
   }
 }

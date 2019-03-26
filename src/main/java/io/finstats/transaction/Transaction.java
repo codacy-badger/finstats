@@ -1,21 +1,18 @@
 package io.finstats.transaction;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
-public final class Transaction {
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class Transaction {
 
   private double amount;
   private long timestamp;
-
-  public Transaction() {
-    throw new NullPointerException();
-  }
-
-  public Transaction(double amount, long timestamp) {
-    this.amount = amount;
-    this.timestamp = timestamp;
-  }
 }
 
 

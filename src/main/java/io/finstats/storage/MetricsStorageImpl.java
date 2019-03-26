@@ -1,16 +1,20 @@
 package io.finstats.storage;
 
+import static io.finstats.storage.Metric.getOrIncrement;
 import io.finstats.transaction.Transaction;
 import java.time.Duration;
 import static java.time.Duration.ofMillis;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Supplier;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class CircularMetricsStorage implements MetricsStorage {
+public class MetricsStorageImpl implements MetricsStorage {
   private static final int STORAGE_SIZE = 64;
   private static final Duration INTERVAL = Duration.ofMinutes(1);
 
@@ -18,27 +22,39 @@ public class CircularMetricsStorage implements MetricsStorage {
   private final Duration interval;
   private final Supplier<Long> now;
 
-  public CircularMetricsStorage() {
+  public MetricsStorageImpl() {
     this(System::currentTimeMillis, INTERVAL);
   }
 
-  CircularMetricsStorage(Supplier<Long> now, Duration interval) {
+  MetricsStorageImpl(Supplier<Long> now, Duration interval) {
     this.now = now;
     this.interval = interval;
     metrics = new AtomicReferenceArray<>(STORAGE_SIZE);
   }
 
   @Override
-  public void addMetric(Transaction transaction) {
-    final double amount = transaction.getAmount();
+  public void storeMetric(Transaction transaction) {
     getEntry(transaction.getTimestamp())
-        .getMetric()
-        .updateAndGet(metric -> metric.getOrIncrement(amount));
+        .update(transaction.getAmount());
+  }
+
+  @Override
+  public Stream<Metric> getMetricsStream() {
+    long moment = now.get();
+    long start = getMinimalIndex(moment);
+    long end = getCurrentIndex(moment);
+
+    return LongStream.rangeClosed(start, end)
+        .mapToObj(index -> {
+          MetricEntry entry = metrics.get(offset(index));
+          return entry != null && index == entry.index ? entry.getMetric() : null;
+        })
+        .filter(Objects::nonNull);
   }
 
   private MetricEntry getEntry(long timestamp) {
     long index = getIndex(timestamp);
-    int offset = getOffset(index);
+    int offset = offset(index);
 
     log.debug("offset={}, index={} for timestamp={}", offset, index, new Date(timestamp));
 
@@ -47,8 +63,8 @@ public class CircularMetricsStorage implements MetricsStorage {
 
   private long getIndex(long timestamp) {
     long moment = now.get();
-    long start = ofMillis(moment).minus(interval).getSeconds();
-    long end = ofMillis(moment).getSeconds();
+    long start = getMinimalIndex(moment);
+    long end = getCurrentIndex(moment);
 
     long index = ofMillis(timestamp).getSeconds();
 
@@ -58,7 +74,15 @@ public class CircularMetricsStorage implements MetricsStorage {
     return index;
   }
 
-  private int getOffset(long index) {
+  private long getCurrentIndex(long moment) {
+    return ofMillis(moment).getSeconds();
+  }
+
+  private long getMinimalIndex(long moment) {
+    return ofMillis(moment).minus(interval).getSeconds();
+  }
+
+  private int offset(long index) {
     return (int) (index % metrics.length());
   }
 
@@ -77,6 +101,10 @@ public class CircularMetricsStorage implements MetricsStorage {
       this.metric = new AtomicReference<>(metric);
     }
 
+    void update(double amount) {
+      metric.updateAndGet(metric -> getOrIncrement(metric, amount));
+    }
+
     @Override
     public String toString() {
       return "MetricEntry{" +
@@ -85,8 +113,8 @@ public class CircularMetricsStorage implements MetricsStorage {
           '}';
     }
 
-    AtomicReference<Metric> getMetric() {
-      return metric;
+    Metric getMetric() {
+      return metric.get();
     }
   }
 }
